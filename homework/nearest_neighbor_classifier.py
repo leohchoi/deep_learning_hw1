@@ -1,4 +1,5 @@
 import torch
+from .pytorch_basics import PyTorchBasics as pb
 
 
 class NearestNeighborClassifier:
@@ -33,7 +34,7 @@ class NearestNeighborClassifier:
         Returns:
             tuple of x and y both torch.Tensor's.
         """
-        raise NotImplementedError
+        return (torch.as_tensor(x), torch.as_tensor(y))
 
     @classmethod
     def compute_data_statistics(cls, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
@@ -48,7 +49,7 @@ class NearestNeighborClassifier:
             tuple of mean and standard deviation of the data.
             Both should have a shape [1, D]
         """
-        raise NotImplementedError
+        return (torch.mean(x, dim=0)[None, :], torch.std(x, dim=0)[None, :])
 
     def input_normalization(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -72,9 +73,8 @@ class NearestNeighborClassifier:
         Returns:
             tuple of the nearest neighbor data point [D] and its label [1]
         """
-        raise NotImplementedError
         x = self.input_normalization(x)
-        idx = ...  # Implement me:
+        idx = torch.argmin(torch.sum(torch.pow(self.data_normalized - x, 2), dim=1))
         return self.data[idx], self.label[idx]
 
     def get_k_nearest_neighbor(self, x: torch.Tensor, k: int) -> tuple[torch.Tensor, torch.Tensor]:
@@ -90,9 +90,8 @@ class NearestNeighborClassifier:
             data points will be size (k, D)
             labels will be size (k,)
         """
-        raise NotImplementedError
         x = self.input_normalization(x)
-        idx = ...  # Implement me:
+        idx = torch.topk(torch.sum(torch.pow(self.data_normalized - x, 2), dim=1), k=k, largest=False).indices
         return self.data[idx], self.label[idx]
 
     def knn_regression(self, x: torch.Tensor, k: int) -> torch.Tensor:
@@ -107,4 +106,5 @@ class NearestNeighborClassifier:
         Returns:
             average value of labels from the k neighbors. Tensor of shape [1]
         """
-        raise NotImplementedError
+        _, labels = self.get_k_nearest_neighbor(x, k)
+        return torch.mean(labels)
