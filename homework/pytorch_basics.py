@@ -293,7 +293,7 @@ class PyTorchBasics:
 
         Solution length: 36 characters
         """
-        raise NotImplementedError
+        return torch.diff(torch.cat((x, y)))
 
     @staticmethod
     def make_it_pytorch_extra_2(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
@@ -314,4 +314,8 @@ class PyTorchBasics:
 
         Solution length: 64 characters
         """
-        raise NotImplementedError
+        #doing x[:, None] allows broadcasting to compare each element of x with each element of y
+        # then we do abs and < 1e-3 to create a bool based tensor then do .any to get tensor with 
+        # len(y) with each element corresponding to each row for whether or not they had true or false 
+        # then sum does the count
+        return torch.sum(torch.any(torch.abs((x[:, None] - y)) < 1e-3, dim=1))
